@@ -170,7 +170,7 @@ let words = [
     { word: "distinguished", phonetic: "/dɪˈstɪŋɡwɪʃt/", meaning: "adj. 卓越的，著名的；高贵的", cat: "特征/属性" },
     { word: "mediocre", phonetic: "/ˌmiːdiˈəʊkə(r)/", meaning: "adj. 平庸的，普通的", cat: "特征/属性" },
     { word: "ordinary", phonetic: "/ˈɔːdnri/", meaning: "adj. 普通的，平常的", cat: "特征/属性" },
-    { word: "average", phonetic: "/ˈævərɪdʒ/", meaning: "adj. 普通s，平均的", cat: "特征/属性" },
+    { word: "average", phonetic: "/ˈævərɪdʒ/", meaning: "adj. 普通的，平均的", cat: "特征/属性" },
     { word: "abundant", phonetic: "/əˈbʌndənt/", meaning: "adj. 大量的，丰富的", cat: "特征/属性" },
     { word: "acute", phonetic: "/əˈkjuːt/", meaning: "adj. 严重的；急性的；敏锐的", cat: "特征/属性" },
     { word: "adamant", phonetic: "/ˈædəmənt/", meaning: "adj. 坚定的，固执的", cat: "特征/属性" },
