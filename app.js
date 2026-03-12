@@ -744,26 +744,34 @@ function menu() {
 }
 
 function init() {
+    let catFilter = category.value
+
     // 首页统计
-    let learnt = Object.keys(progress).length
-    let total = words.length
+    let filteredWords = words.filter(w => !catFilter || w.cat === catFilter)
+    let learnt = filteredWords.filter(w => progress[w.word]).length
+    let total = filteredWords.length
     let now = Date.now()
-    let dueCount = words.filter(w => !progress[w.word] || progress[w.word].due <= now).length
+    let dueCount = filteredWords.filter(w => {
+        let p = progress[w.word]
+        return !p || p.due <= now
+    }).length
 
     document.getElementById("quick-stats").innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: baseline;">
-            <div style="font-size: 14px; opacity: 0.8;">学习进度</div>
+            <div style="font-size: 14px; opacity: 0.8;">学习进度 ${catFilter ? `(${catFilter})` : ""}</div>
             <div style="font-weight: 700; color: var(--primary);">${learnt}/${total}</div>
         </div>
         <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin: 8px 0 16px;">
-            <div style="width: ${Math.round(learnt / total * 100)}%; height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.5s;"></div>
+            <div style="width: ${total > 0 ? Math.round(learnt / total * 100) : 0}%; height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.5s;"></div>
         </div>
     `
 
-    // 分类下拉
-    let cats = [...new Set(words.map(w => w.cat))].filter(Boolean)
-    category.innerHTML = '<option value="">全部分类 (All)</option>' +
-        cats.map(c => `<option value="${c}">${c}</option>`).join("")
+    // 分类下拉 - 仅在为空时初始化，防止重置选中项
+    if (category.options.length === 0) {
+        let cats = [...new Set(words.map(w => w.cat))].filter(Boolean)
+        category.innerHTML = '<option value="">全部分类 (All)</option>' +
+            cats.map(c => `<option value="${c}">${c}</option>`).join("")
+    }
 
     today.innerHTML = `今日待复习: <span style="color: var(--accent)">${dueCount}</span>`
 }
