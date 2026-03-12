@@ -231,9 +231,22 @@ let words = [
 let progress = JSON.parse(localStorage.getItem("progress") || "{}")
 let fav = JSON.parse(localStorage.getItem("fav") || "[]")
 
-let queue = []
-let current = null
 let flipped = false
+
+// DOM Elements
+const card = document.getElementById("card")
+const rate = document.getElementById("rate")
+const tapHint = document.getElementById("tapHint")
+const wordInfo = document.getElementById("wordInfo")
+const speakBtn = document.getElementById("speakBtn")
+const favBtn = document.getElementById("favBtn")
+const category = document.getElementById("category")
+const today = document.getElementById("today")
+const q = document.getElementById("q")
+const result = document.getElementById("result")
+const chart = document.getElementById("chart")
+const statText = document.getElementById("statText")
+const importText = document.getElementById("importText")
 
 
 /* ===== SM2 & Memory System ===== */
@@ -320,7 +333,7 @@ function showFront() {
     `
     card.onclick = flip
     rate.classList.add("hidden")
-    tap_hint.classList.remove("hidden")
+    tapHint.classList.remove("hidden")
 
     if (fav.includes(current.word)) favBtn.classList.add("fav-active")
     else favBtn.classList.remove("fav-active")
@@ -337,7 +350,7 @@ function flip() {
         <div class="card-meaning">${current.meaning}</div>
     `
     rate.classList.remove("hidden")
-    tap_hint.classList.add("hidden")
+    tapHint.classList.add("hidden")
 
     // 显示记忆曲线数据
     let p = progress[current.word] || { ef: 2.5, interval: 0, reps: 0 }
