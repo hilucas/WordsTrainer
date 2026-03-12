@@ -50,6 +50,9 @@ function buildQueue(isNew = false) {
         if (isNew) return !p
         return !p || p.due <= now
     })
+
+    // 随机打乱队列以获得更好体验
+    queue.sort(() => Math.random() - 0.5)
 }
 
 
@@ -80,7 +83,7 @@ function showImport() { show("import") }
 
 function next() {
     if (queue.length == 0) {
-        alert("今日任务已完成！")
+        alert("本组任务已完成！")
         menu()
         return
     }
@@ -90,22 +93,34 @@ function next() {
 
 function showFront() {
     flipped = false
-    card.innerHTML = current.word +
-        "<div class=small>" + current.phonetic + "</div>"
+    card.innerHTML = `
+        <div class="card-main">${current.word}</div>
+        <div class="card-phonetic">${current.phonetic}</div>
+    `
     card.onclick = flip
     rate.classList.add("hidden")
+    tap_hint.classList.remove("hidden")
 
     if (fav.includes(current.word)) favBtn.classList.add("fav-active")
     else favBtn.classList.remove("fav-active")
+
+    wordInfo.innerHTML = "" // 翻面前先隐藏数据，保持神秘感
 }
 
 function flip() {
     if (flipped) return
     flipped = true
-    card.innerHTML = current.word +
-        "<div class=small>" + current.phonetic + "</div>" +
-        "<br><br>" + current.meaning
+    card.innerHTML = `
+        <div class="card-main">${current.word}</div>
+        <div class="card-phonetic">${current.phonetic}</div>
+        <div class="card-meaning">${current.meaning}</div>
+    `
     rate.classList.remove("hidden")
+    tap_hint.classList.add("hidden")
+
+    // 显示记忆曲线数据
+    let p = progress[current.word] || { ef: 2.5, interval: 0, reps: 0 }
+    wordInfo.innerHTML = `掌握度: ${p.reps > 0 ? (p.ef * 20).toFixed(0) + '%' : "新词"} | 下次复习: ${p.interval} 天后`
 }
 
 
@@ -113,10 +128,16 @@ function flip() {
 
 function search() {
     let query = document.getElementById("q").value.toLowerCase()
+    if (!query) {
+        result.innerHTML = ""
+        return
+    }
     let r = words.filter(w => w.word.toLowerCase().includes(query) || w.meaning.includes(query))
     result.innerHTML = r.map(x =>
-        `<div style="margin:10px; padding:10px; background:#334155; border-radius:8px; text-align:left;">
-            <b>${x.word}</b> [${x.phonetic}]<br>${x.meaning}
+        `<div class="glass-panel" style="margin-bottom: 12px; padding: 15px; text-align: left;">
+            <div style="font-weight: 600; color: var(--primary); font-size: 18px;">${x.word}</div>
+            <div style="font-size: 14px; opacity: 0.6; margin-bottom: 5px;">${x.phonetic}</div>
+            <div>${x.meaning}</div>
         </div>`
     ).join("")
 }
@@ -153,7 +174,7 @@ function importWords() {
             })
         }
     })
-    alert("导入完成！已更新词库内容。")
+    alert("导入成功！已更新词库内容。")
     importText.value = ""
     init()
 }
@@ -164,6 +185,10 @@ function importWords() {
 function speak() {
     let u = new SpeechSynthesisUtterance(current.word)
     speechSynthesis.speak(u)
+
+    // 视觉反馈
+    speakBtn.style.transform = "scale(1.2)"
+    setTimeout(() => { speakBtn.style.transform = "scale(1)" }, 200)
 }
 
 
@@ -174,16 +199,18 @@ function exportProgress() {
         progress: progress,
         fav: fav
     }
-    let blob = new Blob([JSON.stringify(data)], { type: "application/json" })
-    let url = URL.createObjectURL(blob)
-    let a = document.createElement("a")
-    a.href = url
-    a.download = `word_trainer_backup_${new Date().toLocaleDateString()}.json`
-    a.click()
+    let str = JSON.stringify(data)
+    try {
+        navigator.clipboard.writeText(str)
+        alert("进度数据已复制到剪贴板！请将其保存在安全的地方。")
+    } catch (e) {
+        // 退化方案：直接弹窗
+        prompt("请复制以下文本进行备份：", str)
+    }
 }
 
 function importProgress() {
-    let str = prompt("请粘贴导出的备份 JSON 文本（或联系开发者协助）：")
+    let str = prompt("请粘贴导出的备份数据：")
     if (!str) return
     try {
         let data = JSON.parse(str)
@@ -195,7 +222,7 @@ function importProgress() {
             location.reload()
         }
     } catch (e) {
-        alert("格式错误，请确保粘贴的是正确的备份文本。")
+        alert("解析错误，请检查文本是否完整。")
     }
 }
 
@@ -205,28 +232,55 @@ function importProgress() {
 function updateStats() {
     let learnt = Object.keys(progress).length
     let total = words.length
-    let master = Object.values(progress).filter(p => p.ef > 2.2 && p.reps > 3).length
+    let master = Object.values(progress).filter(p => p.ef > 2.2 && p.reps > 2).length
 
     statText.innerHTML = `
-        <p>词库总量: ${total}</p>
-        <p>已学单词: ${learnt}</p>
-        <p>熟练掌握: ${master}</p>
-        <p>进度: ${Math.round(learnt / total * 100)}%</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+            <div class="glass-panel" style="padding: 15px; text-align: center;">
+                <div style="opacity: 0.6; font-size: 13px;">词库总量</div>
+                <div style="font-size: 24px; font-weight: 700;">${total}</div>
+            </div>
+            <div class="glass-panel" style="padding: 15px; text-align: center;">
+                <div style="opacity: 0.6; font-size: 13px;">已学单词</div>
+                <div style="font-size: 24px; font-weight: 700;">${learnt}</div>
+            </div>
+            <div class="glass-panel" style="padding: 15px; text-align: center;">
+                <div style="opacity: 0.6; font-size: 13px;">熟练掌握</div>
+                <div style="font-size: 24px; font-weight: 700;">${master}</div>
+            </div>
+            <div class="glass-panel" style="padding: 15px; text-align: center;">
+                <div style="opacity: 0.6; font-size: 13px;">记忆进度</div>
+                <div style="font-size: 24px; font-weight: 700;">${Math.round(learnt / total * 100)}%</div>
+            </div>
+        </div>
     `
 
     let ctx = chart.getContext("2d")
-    ctx.clearRect(0, 0, 320, 200)
-    ctx.fillStyle = "#3b82f6"
-    ctx.fillRect(20, 150, 280 * (learnt / total || 0), 20)
-    ctx.strokeStyle = "white"
-    ctx.strokeRect(20, 150, 280, 20)
+    ctx.clearRect(0, 0, 300, 150)
+
+    // 绘制简易环形图
+    let centerX = 150, centerY = 75, radius = 50
+    ctx.lineWidth = 10
+
+    // 背景环
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI)
+    ctx.strokeStyle = "rgba(255,255,255,0.1)"
+    ctx.stroke()
+
+    // 进度环
+    let angle = (learnt / total) * 2 * Math.PI
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, radius, -Math.PI / 2, angle - Math.PI / 2)
+    ctx.strokeStyle = "#38bdf8"
+    ctx.stroke()
 }
 
 
 /* ===== UI & 初始化 ===== */
 
 function show(id) {
-    document.querySelectorAll("body > div")
+    document.querySelectorAll(".app-container > div")
         .forEach(d => d.classList.add("hidden"))
     document.getElementById(id).classList.remove("hidden")
 }
@@ -237,13 +291,28 @@ function menu() {
 }
 
 function init() {
+    // 首页统计
+    let learnt = Object.keys(progress).length
+    let total = words.length
+    let now = Date.now()
+    let dueCount = words.filter(w => !progress[w.word] || progress[w.word].due <= now).length
+
+    document.getElementById("quick-stats").innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div style="font-size: 14px; opacity: 0.8;">学习进度</div>
+            <div style="font-weight: 700; color: var(--primary);">${learnt}/${total}</div>
+        </div>
+        <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin: 8px 0 16px;">
+            <div style="width: ${Math.round(learnt / total * 100)}%; height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.5s;"></div>
+        </div>
+    `
+
+    // 分类下拉
     let cats = [...new Set(words.map(w => w.cat))].filter(Boolean)
-    category.innerHTML = '<option value="">全部分类</option>' +
+    category.innerHTML = '<option value="">全部分类 (All)</option>' +
         cats.map(c => `<option value="${c}">${c}</option>`).join("")
 
-    let now = Date.now()
-    let count = words.filter(w => !progress[w.word] || progress[w.word].due <= now).length
-    today.innerHTML = `<p class="small">今日待复习: ${count} 词</p>`
+    today.innerHTML = `今日待复习: <span style="color: var(--accent)">${dueCount}</span>`
 }
 
 function save() {
@@ -251,4 +320,5 @@ function save() {
     localStorage.setItem("fav", JSON.stringify(fav))
 }
 
+// 启动
 init()
