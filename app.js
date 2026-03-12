@@ -345,8 +345,7 @@ let words = [
     { word: "deviate", phonetic: "/ˈdiːvieɪt/", meaning: "v. 偏离，背离", cat: "学术/专业" },
     { word: "differentiate", phonetic: "/ˌdɪfəˈrenʃieɪt/", meaning: "v. 区分，辨别", cat: "学术/专业" },
     { word: "discriminate", phonetic: "/dɪˈskrɪmɪneɪt/", meaning: "v. 区分，辨别；歧视", cat: "学术/专业" },
-    {
-        word: "document", phonetic: "/ˈdɒkjumənt/", n.文件 v.记录", cat: "学术 / 专业" },
+    { word: "document", phonetic: "/ˈdɒkjumənt/", meaning: "n. 文件 v. 记录", cat: "学术/专业" },
     { word: "therapeutic", phonetic: "/ˌθerəˈpjuːtɪk/", meaning: "adj. 治疗的，理疗的；有益的", cat: "学术/专业" },
     { word: "treatment", phonetic: "/ˈtriːtmənt/", meaning: "n. 治疗，疗法；处理", cat: "学术/专业" },
     { word: "cure", phonetic: "/kjʊə(r)/", meaning: "v./n. 治愈，治疗；疗法", cat: "学术/专业" },
