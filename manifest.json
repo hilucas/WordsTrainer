@@ -1,0 +1,15 @@
+{
+"name":"Word Trainer Pro",
+"short_name":"WordTrainer",
+"display":"standalone",
+"start_url":"index.html",
+"background_color":"#0f172a",
+"theme_color":"#0f172a",
+"icons":[
+{
+"src":"icon.png",
+"sizes":"192x192",
+"type":"image/png"
+}
+]
+}

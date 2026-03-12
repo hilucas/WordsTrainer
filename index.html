@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Word Trainer Pro</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body {
+            font-family: system-ui;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 6px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .main {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 14px;
+            margin-top: 20px;
+            font-size: 30px;
+        }
+
+        .small {
+            font-size: 18px;
+            opacity: .7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .option {
+            display: block;
+            margin: 8px auto;
+            width: 80%;
+            background: #334155;
+        }
+
+        .correct {
+            background: #22c55e;
+        }
+
+        .wrong {
+            background: #ef4444;
+        }
+
+        .fav-active {
+            color: #ffb800 !important;
+            transform: scale(1.2);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h1>📚 Word Trainer Pro</h1>
+
+    <div id="menu">
+
+        <button class="main" onclick="startStudy()">开始复习</button>
+
+        <button onclick="startNew()">学习新词</button>
+
+        <button onclick="showSearch()">搜索</button>
+
+        <button onclick="showStats()">统计</button>
+
+        <button onclick="showImport()">导入/备份</button>
+
+        <br><br>
+
+        <select id="category"></select>
+
+        <div id="today"></div>
+
+    </div>
+
+
+    <div id="study" class="hidden">
+
+        <div class="card" id="card"></div>
+
+        <div id="options"></div>
+
+        <div id="rate" class="hidden">
+
+            <button onclick="grade(1)">Again</button>
+            <button onclick="grade(3)">Hard</button>
+            <button onclick="grade(4)">Good</button>
+            <button onclick="grade(5)">Easy</button>
+
+        </div>
+
+        <br>
+
+        <button id="speakBtn" onclick="speak()">🔊</button>
+
+        <button id="favBtn" onclick="toggleFav()">⭐</button>
+
+        <br><br>
+
+        <button onclick="menu()">返回</button>
+
+    </div>
+
+
+    <div id="search" class="hidden">
+
+        <input id="q" placeholder="输入单词或含义" style="padding:10px; border-radius:8px; border:none; width:70%;">
+
+        <button onclick="search()">搜索</button>
+
+        <div id="result" style="margin-top:20px;"></div>
+
+        <button onclick="menu()">返回</button>
+
+    </div>
+
+
+    <div id="stats" class="hidden">
+
+        <h2>学习统计</h2>
+
+        <canvas id="chart" width="320" height="200"></canvas>
+
+        <div id="statText"></div>
+
+        <button onclick="menu()">返回</button>
+
+    </div>
+
+
+    <div id="import" class="hidden">
+
+        <h2>导入词表</h2>
+        <div class="small">格式：单词, 读音, 含义, 分类 (每行一个)</div>
+        <textarea id="importText" rows="10" cols="30" style="width:90%; border-radius:8px; padding:10px;"
+            placeholder="apple,/ˈæpl/,苹果,fruit"></textarea>
+
+        <br>
+
+        <button onclick="importWords()">导入词表</button>
+
+        <hr style="opacity:0.2; margin:20px 0;">
+
+        <h3>学习进度管理</h3>
+        <p class="small">如果您在多个设备间使用，可以导出/导入进度 JSON</p>
+        <button onclick="exportProgress()" style="background:#22c55e; color:white;">导出进度备份</button>
+        <button onclick="importProgress()" style="background:#f59e0b; color:white;">恢复进度备份</button>
+
+        <br><br>
+
+        <button onclick="menu()">返回</button>
+
+    </div>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
